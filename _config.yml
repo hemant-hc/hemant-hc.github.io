@@ -1,9 +1,9 @@
-title: Blog
-author:
+title: Hemant Chaudhary
+author: 
   name: Hemant
   email: iamhemantchaudhary1@gmail.com
 description: > # this means to ignore newlines until "show_excerpts:"
-  This is the description to the website
+ 
 
 show_excerpts: false # set to true to show excerpts on the homepage
 
