@@ -1,4 +1,2 @@
-echo "www.hemantchaudhary.in" > CNAME
-git add -A
-git commit -m “Added CNAME file.”
-git push origin master
+www.hemantchaudhary.in
+
