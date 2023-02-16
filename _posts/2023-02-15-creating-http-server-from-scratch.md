@@ -180,7 +180,7 @@ class HTTPRequestParser {
                 return `Hello ${this.parsedBody.name}, you live at address: ${this.parsedBody.address}`;
             }
             case "/": {
-                return `Hello, world!";
+                return "Hello, world!";
             }
             default: {
                 throw new Error("404: Path not found");
