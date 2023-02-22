@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Creating HTTP Server from scratch with NodeJS"
+title: "Creating HTTP Server from scratch with NodeJS Part I"
 ---
 
 In this post, we will be bulding a simple HTTP server from scratch using NodeJS and in doing so we will review the basic structure of HTTP requests and response and get a basic knowlege of how HTTP server works.
@@ -18,12 +18,12 @@ The "hello world" of Node's `http` server:
 {% highlight javascript %}
 const http = require('http');
 const server = http.createServer();
-    server.on('request', (req, res) => {
-    res.setHeader('Content-Type','text/plain');
-    res.end('Hello World!');
+server.on('request', (req, res) => {
+res.setHeader('Content-Type','text/plain');
+res.end('Hello World!');
 });
 server.listen(3000, () => {
-  console.log('Server running on port 3000');
+console.log('Server running on port 3000');
 });
 {% endhighlight %}
 
@@ -52,12 +52,12 @@ We can observe that:
 
 - The first line in the HTTP request is the request line. It compose of three parts:
 
-
   - The request method, `POST` in this case.
   - The request URI `/somepath`
   - The protocol version `HTTP/1.1`
 
   <br />
+
 - Each following line is called request header file. Every header line is optional in the HTTP request. A request header is composed of a field seperated by a `:`.
 
 - A line with only `\r\n` indicates that the end of the request headers. Request body comes after this.
@@ -81,10 +81,10 @@ server.on('connection', handleConnection);
 server.listen(3000);
 
 function handleConnection(socket) {
-  socket.on('data', (chunk) => {
-    console.log('Received chunk:\n', chunk.toString());
-  });
-  socket.write('HTTP/1.1 200 OK\r\nServer: my-web-server\r\n\r\n');
+socket.on('data', (chunk) => {
+console.log('Received chunk:\n', chunk.toString());
+});
+socket.write('HTTP/1.1 200 OK\r\nServer: my-web-server\r\n\r\n');
 }
 {% endhighlight %}
 
@@ -95,7 +95,9 @@ Next, open a new terminal window and use the http command to send a basic `GET` 
 ```
 http -v GET :3000
 ```
+
 We shouldd see a verbose output from HTTPie, that shows us the request and response headers. In the Node terminal we should se something like this:
+
 ```
 Received chunk:
 GET / HTTP/1.1
@@ -104,6 +106,7 @@ User-Agent: HTTPie/2.6.0
 Accept-Encoding: gzip, deflate
 Accept: */*
 ```
+
 Let's make `POST` request now:
 
 ```
@@ -126,9 +129,9 @@ Content-Length: 8
 name=Joe
 ```
 
-Now let's parse the HTTP request, so that we can access the headers and manipulate the request body according to that. 
+Now let's parse the HTTP request, so that we can access the headers and manipulate the request body according to that.
 
-First, we create a HTTPRequestParser class with a constructor that will receive the http response data. Then we convert this raw HTTP response data to string for further processing. 
+First, we create a HTTPRequestParser class with a constructor that will receive the http response data. Then we convert this raw HTTP response data to string for further processing.
 
 We then dissect the HTTP request data to request line, headers and the request body.
 
@@ -137,9 +140,9 @@ const net = require("net");
 const server = net.createServer();
 
 class HTTPRequestParser {
-    constructor(rawHTTPResponse) {
-        this.rawHTTPResponse = rawHTTPResponse;
-        this.httpResponseString = rawHTTPResponse.toString();
+constructor(rawHTTPResponse) {
+this.rawHTTPResponse = rawHTTPResponse;
+this.httpResponseString = rawHTTPResponse.toString();
 
         this.requestType = null;
         this.requestPath = null;
@@ -212,13 +215,14 @@ class HTTPRequestParser {
             }
         }
     };
+
 }
 
 server.on("connection", (socket) => {
-    socket.on("data", (data) => {
-        const parser = new HTTPRequestParser(data);
-        socket.write(parser.getResponse());
-    });
+socket.on("data", (data) => {
+const parser = new HTTPRequestParser(data);
+socket.write(parser.getResponse());
+});
 });
 
 server.listen(8080);
