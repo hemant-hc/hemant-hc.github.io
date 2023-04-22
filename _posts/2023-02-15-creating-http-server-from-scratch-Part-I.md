@@ -16,15 +16,16 @@ The callback recieves two arguments: a request object and a response object. The
 The "hello world" of Node's `http` server:
 
 {% highlight javascript %}
-const http = require('http');
+const http = require("http");
 const server = http.createServer();
-server.on('request', (req, res) => {
-res.setHeader('Content-Type','text/plain');
-res.end('Hello World!');
+server.on("request", (req, res) => {
+  res.setHeader("Content-Type", "text/plain");
+  res.end("Hello World!");
 });
 server.listen(3000, () => {
-console.log('Server running on port 3000');
+  console.log("Server running on port 3000");
 });
+
 {% endhighlight %}
 
 This starts a web server on port 3000. When a `GET` request comes in, this server returns "Hello, World!" at the port we are listening at.
@@ -75,16 +76,16 @@ When we make a HTTP request reading from the socket will give us the text of the
 To make the HTTP request we will be using HTTPie.
 
 {% highlight js %}
-const net = require('net');
+const net = require("net");
 const server = net.createServer();
-server.on('connection', handleConnection);
+server.on("connection", handleConnection);
 server.listen(3000);
 
 function handleConnection(socket) {
-socket.on('data', (chunk) => {
-console.log('Received chunk:\n', chunk.toString());
-});
-socket.write('HTTP/1.1 200 OK\r\nServer: my-web-server\r\n\r\n');
+  socket.on("data", (chunk) => {
+    console.log("Received chunk:\n", chunk.toString());
+  });
+  socket.write("HTTP/1.1 200 OK\r\nServer: my-web-server\r\n\r\n");
 }
 {% endhighlight %}
 
@@ -140,89 +141,87 @@ const net = require("net");
 const server = net.createServer();
 
 class HTTPRequestParser {
-constructor(rawHTTPResponse) {
-this.rawHTTPResponse = rawHTTPResponse;
-this.httpResponseString = rawHTTPResponse.toString();
+  constructor(rawHTTPResponse) {
+    this.rawHTTPResponse = rawHTTPResponse;
+    this.httpResponseString = rawHTTPResponse.toString();
 
-        this.requestType = null;
-        this.requestPath = null;
-        this.httpVersion = null;
-        this.headers = {};
-        this.body = null;
-        this.parsedBody = {};
+    this.requestType = null;
+    this.requestPath = null;
+    this.httpVersion = null;
+    this.headers = {};
+    this.body = null;
+    this.parsedBody = {};
 
-        this.processHTTPResponseString();
-        this.processBody();
+    this.processHTTPResponseString();
+    this.processBody();
+  }
+
+  processHTTPResponseString = () => {
+    const splitResponse = this.httpResponseString.split("\r\n");
+
+    const [requestType, requestPath, httpVersion] = splitResponse[0].split(" ");
+    this.requestType = requestType;
+    this.requestPath = requestPath;
+    this.httpVersion = httpVersion;
+
+    const headersSplit = splitResponse
+      .slice(1, splitResponse.length - 2)
+      .map((kv) => ({
+        key: kv.split(":")[0],
+        value: kv.split(":")[1].trimLeft(),
+      }));
+    headersSplit.forEach((kv) => {
+      this.headers[kv.key] = kv.value;
+    });
+
+    this.body = splitResponse[splitResponse.length - 1];
+  };
+
+  getResponseBodyForPath = () => {
+    switch (this.requestPath) {
+      case "/details": {
+        return `Hello ${this.parsedBody.name}, you live at address: ${this.parsedBody.address}`;
+      }
+      case "/": {
+        return "Hello, world!";
+      }
+      default: {
+        throw new Error("404: Path not found");
+      }
     }
+  };
 
-    processHTTPResponseString = () => {
-        const splitResponse = this.httpResponseString.split("\r\n");
+  getResponse = () => {
+    const body = this.getResponseBodyForPath();
+    return `HTTP/1.1 200 OK\r\nServer: learning-server\r\nContent-Length: ${body.length}\r\n\r\n${body}`;
+  };
 
-        const [requestType, requestPath, httpVersion] =
-            splitResponse[0].split(" ");
-        this.requestType = requestType;
-        this.requestPath = requestPath;
-        this.httpVersion = httpVersion;
+  processBody = () => {
+    const [mimeType, ...others] = this.headers["Content-Type"].split(";");
 
-        const headersSplit = splitResponse
-            .slice(1, splitResponse.length - 2)
-            .map((kv) => ({
-                key: kv.split(":")[0],
-                value: kv.split(":")[1].trimLeft(),
-            }));
-        headersSplit.forEach((kv) => {
-            this.headers[kv.key] = kv.value;
+    switch (mimeType) {
+      case "application/x-www-form-urlencoded": {
+        this.body.split("&").forEach((element) => {
+          const splitElement = element
+            .split("=")
+            .map((element) => element.replace(/\+/g, "%20"))
+            .map(decodeURI);
+          this.parsedBody[splitElement[0]] = splitElement[1];
         });
-
-        this.body = splitResponse[splitResponse.length - 1];
-    };
-
-    getResponseBodyForPath = () => {
-        switch (this.requestPath) {
-            case "/details": {
-                return `Hello ${this.parsedBody.name}, you live at address: ${this.parsedBody.address}`;
-            }
-            case "/": {
-                return "Hello, world!";
-            }
-            default: {
-                throw new Error("404: Path not found");
-            }
-        }
-    };
-
-    getResponse = () => {
-        const body = this.getResponseBodyForPath();
-        return `HTTP/1.1 200 OK\r\nServer: learning-server\r\nContent-Length: ${body.length}\r\n\r\n${body}`;
-    };
-
-    processBody = () => {
-        const [mimeType, ...others] = this.headers["Content-Type"].split(";");
-
-        switch (mimeType) {
-            case "application/x-www-form-urlencoded": {
-                this.body.split("&").forEach((element) => {
-                    const splitElement = element
-                        .split("=")
-                        .map((element) => element.replace(/\+/g, "%20"))
-                        .map(decodeURI);
-                    this.parsedBody[splitElement[0]] = splitElement[1];
-                });
-                break;
-            }
-            default: {
-                throw new Error("500: Not Implemented");
-            }
-        }
-    };
-
+        break;
+      }
+      default: {
+        throw new Error("500: Not Implemented");
+      }
+    }
+  };
 }
 
 server.on("connection", (socket) => {
-socket.on("data", (data) => {
-const parser = new HTTPRequestParser(data);
-socket.write(parser.getResponse());
-});
+  socket.on("data", (data) => {
+    const parser = new HTTPRequestParser(data);
+    socket.write(parser.getResponse());
+  });
 });
 
 server.listen(8080);

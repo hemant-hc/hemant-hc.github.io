@@ -12,4 +12,4 @@ I'm currently honing my skills in HTML, CSS, JavaScript, and other front-end tec
 <br/><br/><br/><br/><br/><br/>
 Contact me: 
 
-[Github](https://github.com/hemant-hc) | [LinkedIn](https://www.linkedin.com/in/hemant-chaudhary-37102523a/) |  me@hemantchaudhary1.in
+[Github](https://github.com/hemant-hc) | [LinkedIn](https://www.linkedin.com/in/hemant-chaudhary-37102523a/) |  me@hemantchaudhary.in
