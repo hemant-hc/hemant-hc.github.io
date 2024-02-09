@@ -3,8 +3,6 @@ layout: post
 title: "Building a RestAPI Client with TypeScript and TanStack Query for Plone 6 [GSoC'23]"
 ---
 
-Introduction
-
 Recently, I embarked on a project that aimed to create a RESTful API client written in TypeScript, leveraging the power of TanStack Query, to interact with a Plone 6 backend. This project not only addressed the need for modernizing data fetching but also made it versatile for use in various front-end frameworks like React, Vue, Solid, and Svelte. In this blog post, I'll share my journey and the key highlights of this project.
 
 Community Benefits
